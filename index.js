@@ -14,8 +14,8 @@ app.get('/api/notes',(request,response)  => {
 })
 app.delete('/api/notes/:id',(request,response) => {
   const id = request.params.id
-  Note.findByIdAndDelete(id).then( result=>
-    response.status(204).end()
+  Note.findByIdAndDelete(id).then(result =>
+    response.json(result)
   )
 }
 
