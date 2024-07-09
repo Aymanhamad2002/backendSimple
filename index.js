@@ -18,8 +18,20 @@ app.delete('/api/notes/:id',(request,response) => {
     response.json(result)
   )
 }
-
 )
+app.post('/api/notes',(request,response) => {
+  const body = request.body
+  const content = body.content
+  const important = body.important || false
+  const note = new Note({
+    content,
+    important
+  })
+  note
+    .save()
+    .then(result => response.json(result))
+
+})
 app.listen(process.env.PORT,() => {
   console.log(`Server is running on port : ${process.env.PORT}`)
 })
