@@ -32,6 +32,18 @@ app.post('/api/notes',(request,response) => {
     .then(result => response.json(result))
 
 })
+app.put('/api/notes/:id',(request,response) => {
+  const body = request.body
+  const note = {
+    content: body.content,
+    important : body.important,
+  }
+
+  Note.findByIdAndUpdate(request.params.id,note ,{ new: true })
+    .then(result => {
+      response.json(result)
+    })
+})
 app.listen(process.env.PORT,() => {
   console.log(`Server is running on port : ${process.env.PORT}`)
 })
