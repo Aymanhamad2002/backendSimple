@@ -19,7 +19,7 @@ app.delete('/api/notes/:id',(request,response) => {
   )
 }
 )
-app.post('/api/notes',(request,response) => {
+app.post('/api/notes',(request,response,next) => {
   const body = request.body
   const content = body.content
   const important = body.important || false
@@ -30,6 +30,7 @@ app.post('/api/notes',(request,response) => {
   note
     .save()
     .then(result => response.json(result))
+    .catch(error => next(error))
 
 })
 app.put('/api/notes/:id',(request,response) => {
@@ -39,11 +40,28 @@ app.put('/api/notes/:id',(request,response) => {
     important : body.important,
   }
 
-  Note.findByIdAndUpdate(request.params.id,note ,{ new: true })
+  Note.findByIdAndUpdate(request.params.id,note ,{ new: true ,runValidators: true,context:'query' })
     .then(result => {
       response.json(result)
     })
 })
+const unkownEndPoint = (request,response) => {
+  response.status(404).send({ error : 'unkown end point ' })
+
+}
+app.use(unkownEndPoint)
+
+const errorHander = (error,request,response,next) => {
+  console.log(error.message)
+  if(error.name === 'CastError'){
+    return response.status(400).send({ error:'malformated id' })
+  }
+  else if(error.name === 'ValidationError'){
+    return response.status(400).json({ error: error.message })
+  }
+  next(error)
+}
+app.use(errorHander)
 app.listen(process.env.PORT,() => {
   console.log(`Server is running on port : ${process.env.PORT}`)
 })
